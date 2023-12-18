@@ -83,11 +83,10 @@ public class BoardService {
 	}
 	public ReplyDto replyInsert3(ReplyDto reply) {
 		ReplyDto rDto=null;
-		if(bDao.replyInsert(reply)) {
-			int r_num=bDao.getReplyR_Num();
-			log.info("****r_num:{}",reply.getR_num());
-			rDto=bDao.getReplyNewOne(reply.getR_num());
+		if(bDao.replyInsertSelectKey(reply)) {  //r_num: 39
+			log.info("****r_num:{}", reply.getR_num()); //39
+			rDto=bDao.getReplyNewOne(reply.getR_num()); // (39)  
 		}
-		return null;
+		return rDto;
 	}
 }

@@ -16,8 +16,9 @@ public class WebConfig implements WebMvcConfigurer {
 		.addPathPatterns("/**")    //"/board/list/1"  
 		.excludePathPatterns("/","/js/**","/css/**","/img/**")  
 		.excludePathPatterns("/member/loginfrm","/member/login","/member/logout")  
-		.excludePathPatterns("/member/joinfrm","/member/join")
-		//서버 에러시 자동으로 /error 요청함 
+		.excludePathPatterns("/member/joinfrm","/member/join","/member/idCheck")
+		//서버기동시 BasicController에서 자동으로 /error 요청함
+		//,단 컨트롤러에 명시하지않아도 됨 
 		.excludePathPatterns("/favicon.ico","/error");
 		//.excludePathPatterns("/board/list");  
 	}

@@ -18,37 +18,21 @@ import com.icia.board.service.BoardService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-
 @RestController
 @Slf4j
 public class BoardRestController {
 	@Autowired
 	private BoardService bSer;
-
-	@PostMapping("/board/reply")
-	public List<ReplyDto> replyInsert(Integer r_bnum, ReplyDto reply, HttpSession session) {
-		// MemberDto member=(MemberDto)session.getAttribute("mb");
-		// String id=member.getM_id();
-		// reply.setR_writer(id);
-
-		log.info("*****reply:{}", reply);
-		List<ReplyDto> rList = bSer.replyInsert(reply);
-		BoardDto board = bSer.getBoardDetail(r_bnum);
-		System.out.println("b_num"+r_bnum);
-		List<ReplyDto> nList = bSer.getReplyList(r_bnum);
-		// ObjectMapper om=new ObjectMapper();
-		// return om.writeValueAsString(rList);
-		return rList; // 자바객체--->jackson(메세지컨버터)--> json
-
-	}
+	
 	@PostMapping("/board/reply3")
 	public ReplyDto boardReply3(@RequestBody ReplyDto reply) {
 		log.info("reply:{}",reply);
 		ReplyDto rDto=bSer.replyInsert3(reply);
-		return rDto;
+		return rDto;  //json
 	}
+	
 	@PostMapping("/board/reply2")
-	public Map<String, Object> replyInsert2(ReplyDto reply, HttpSession session){
+	public Map<String, Object> replyInsert2(@RequestBody ReplyDto reply, HttpSession session){
 		log.info("*****reply:{}",reply);
 		List<ReplyDto> rList=bSer.replyInsert(reply);
 //		if(rList) {
@@ -60,5 +44,17 @@ public class BoardRestController {
 		hMap.put("rList", rList);
 		hMap.put("bDto", bDto);
 		return hMap;
+	}
+	
+	@PostMapping("/board/reply")
+	public List<ReplyDto> replyInsert(ReplyDto reply, HttpSession session){
+		//MemberDto member=(MemberDto)session.getAttribute("mb");
+		//String id=member.getM_id();
+		//reply.setR_writer(id);
+		log.info("*****reply:{}",reply);
+		List<ReplyDto> rList=bSer.replyInsert(reply);
+		//ObjectMapper om=new ObjectMapper();
+		//return om.writeValueAsString(rList);
+		return  rList;  //자바객체--->jackson(메세지컨버터)--> json
 	}
 }

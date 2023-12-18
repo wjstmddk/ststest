@@ -8,10 +8,13 @@
 <meta charset="UTF-8">
 <title>글 상세 보기- boardDetail</title>
 <script src="/js/jquery-3.7.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"
- integrity="sha512-Gn0tSSjkIGAkaZQWjx3Ctl/0dVJuTmjW/f9QyB302kFjU4uTNP4HtA32U2qXs/TRlEsK5CoEqMEMs7LnzLOBsA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"
+	integrity="sha512-Gn0tSSjkIGAkaZQWjx3Ctl/0dVJuTmjW/f9QyB302kFjU4uTNP4HtA32U2qXs/TRlEsK5CoEqMEMs7LnzLOBsA=="
+	crossorigin="anonymous" referrerpolicy="no-referrer">
  </script>
 <link rel="stylesheet" href="/css/style.css">
+
 <script>
 	//메시지 출력 부분
 	let m = "${msg}";
@@ -73,7 +76,7 @@ $(()=>{
 						<div class="t_content p-15 content_h">CONTENTS</div>
 						<div class="d_content p-85 content_h">${board.b_contents}</div>
 					</div>
-					
+
 					<div class="btn-area">
 						<button class="btn-write" id="upbtn"
 							onclick="upload_board('${board.b_num}')">U</button>
@@ -88,9 +91,10 @@ $(()=>{
 							value="${board.b_num}">
 						<textarea name="r_contents" rows="3" class="write-input ta"
 							id="r_contents" placeholder="댓글을 적어주세요."></textarea>
-						<input type="hidden" name="r_id" id="r_id" value="${mb.m_id}">
-						<input type="button" value="댓글 전송" class="btn-write"
-							onclick="replyInsert()" style="width: 100%; margin-bottom: 30px;">
+						<input type="hidden" name="r_writer" id="r_writer"
+							value="${mb.m_id}"> <input type="button" value="댓글 전송"
+							class="btn-write" onclick="replyInsert()"
+							style="width: 100%; margin-bottom: 30px;">
 					</form>
 					<table style="width: 100%">
 						<!-- 제목 테이블 -->
@@ -107,15 +111,15 @@ $(()=>{
 								<td class="p-20">${ritem.r_writer}</td>
 								<td class="p-50">${ritem.r_contents}</td>
 								<!-- LocalDateTime을 jstl에서 사용하기: pattern에 꼭 'T'추가할것.-->
-								<td class="p-30">
-								<fmt:parseDate value="${ritem.r_date}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="parsedDateTime" type="both" />
-								<fmt:formatDate pattern="yyyy.MM.dd HH:mm:ss" value="${parsedDateTime}" />
-								</td>
+								<td class="p-30"><fmt:parseDate value="${ritem.r_date}"
+										pattern="yyyy-MM-dd'T'HH:mm:ss" var="parsedDateTime"
+										type="both" /> <fmt:formatDate pattern="yyyy.MM.dd HH:mm:ss"
+										value="${parsedDateTime}" /></td>
 								<!-- private Timestamp r_date 일때-->
-<%-- 								<td class="p-30"> <fmt:formatDate value=" ${ritem.r_date}" --%>
-<%-- 										pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td> --%>
+								<%-- 								<td class="p-30"> <fmt:formatDate value=" ${ritem.r_date}" --%>
+								<%-- 										pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td> --%>
 								<!-- private String r_date 일때 -->
-<%-- 								<td class="p-30">${ritem.r_date}</td> --%>
+								<%-- 								<td class="p-30">${ritem.r_date}</td> --%>
 							</tr>
 						</c:forEach>
 					</table>
@@ -126,44 +130,76 @@ $(()=>{
 			<jsp:include page="footer.jsp"></jsp:include>
 		</footer>
 	</div>
+	<template id="tr_template">
+		<tr>
+			<td class="p-20">{r_writer}</td>
+			<td class="p-50">{r_contents}</td>
+			<td class="p-30">{r_date}</td>
+		</tr>
+	</template>
 
 	<script>
 		function replyInsert(){
-			let data={}
-			data.r_contents=$('#r_contents').val() 
-			data.r_bnum=$('#r_bnum').val()  //원글번호
-			data.r_writer='${mb.m_id}' //글쓴 사람 아이디, session값으로 처리
+			//let data={}
+			//data.r_contents=$('#r_contents').val() 
+			//data.r_bnum=$('#r_bnum').val()  //원글번호
+			//data.r_writer='${mb.m_id}' //글쓴 사람 아이디, session값으로 처리
 			//data.r_date=//db 기본값
-			console.log("data:",data);
+			
+			let data=$('#rform').serializeObject();
+			//form태그의 문자열data를 js객체로 생성, 단 file태그 있을 때는 FormDate객체를 사용할것.
+			//data.r_writer='${mb.m_id}' form태그에 없으면 추가 데이터...
+			console.dir(data);
 			$.ajax({
 				method: 'post', //'get'(select) 'post'(insert,delete,update)
-				url: '/board/reply',
-				data: data,
-/* 				data: {r_contents:$('#r_contents').val(),
-					   r_bnum:$('#r_bnum').val()  }, */
+				//url: '/board/reply',  //List로 리턴
+				//url: '/board/reply2', //Map으로 리턴
+				url: '/board/reply3', //replyDto로 리턴
+				//data: data,
+				//data: $('#rform').serialize()  //r_contents='댓글3'&r_writer='aaa'...
+				//1. urlEncoded방식(get,post): 문자열에 특수문자는 못넘김
+				//2. json방식(post만): 서버에 json형식 데이터 전송--->서버에서 @RequestBoby로 받을것 
+				contentType: 'application/json;charset=UTF-8',
+				data: JSON.stringify(data) 
 				//서버의 ContentType에 리턴할 값의 타입이 자동인식(생략가능)
-				dataType: 'json', //text(html), jsonp, xml	 				
+				//dataType: 'json', //text(html), jsonp, xml	   
 			}).done(function(res){
-// 				console.log("res:",res)
-// 				result=""
-// 				close.Model();
-// 				$('#rtable').empty();
-// 	 				$.each(res,function(index,item){
-// 	 					$("#rtable").append("<tr>")
-// 	 					$("#rtable").append("<td>"+item.r_writer+"</td>")
-// 	 					$("#rtable").append("<td>"+item.r_contents+"</td>")
-// 	 					$("#rtable").append("<td>")
-// 	 					$("#rtable").append(item.r_date)
-// 	 					$("#rtable").append("</td>")
-// 	 					$("#rtable").append("</tr>")
-				$('#rtable').load(location.href+' #rtable')
+				//debugger;
+				console.log("res:",res) //
+				//댓글리스트를 id="rtable" 출력
+// 				let rList=''
+// 				$.each(res, function(i, reply){
+// 					rList+='<tr><td class="p-20">'+reply.r_writer+'</td>'
+// 				           +'<td class="p-50">'+reply.r_contents+'</td>'
+// 				           +'<td class="p-30">'+reply.r_date+'</td></tr>'	
+// 				});//end each 
+//				$('#rtable').html(rList)
+//				$('#r_contents').val('').focus()
 
-				
-// 				})
+				//template 태그 활용
+// 				const $table=$('#rtable');
+// 				const $tmpl=$('#tr_template').html();
+// 				$table.empty(); //기존 테이블 댓글 삭제
+// 				for(const r of res){
+// 					$table.append($tmpl.replace('{r_writer}',r.r_writer)
+// 					     .replace('{r_contents}',r.r_contents)
+// 					     .replace('{r_date}',r.r_date))
+// 				}
 
-			}).fail((res)=>console.log("res:",res))
-		}
-		function replyToRtable(reply){
+			// Map<String,Object> 리턴한 댓글리스트  	
+// 				console.log("res.bDto",res.bDto) 
+// 				console.log("res.rList",res.rList) 
+// 				if(res.rList!=null && res.rList.length!=0){
+// 					mapReplyListToRtable(res.rList); 	
+// 				}
+			// ReplyDto 리턴한 최신댓글을 rtable의 맨위로 추가  	
+ 				//console.log("res",res) 
+				if (res != null && res != '') {
+					replyToRtable(res)
+ 				}
+ 			}).fail((res)=>console.log("res:",res))
+ 		}//end function
+ 		function replyToRtable(reply){
  			let replyHtml = '';
 			replyHtml += '<tr><td class="p-20">' + reply.r_writer
 					+ '</td>' + '<td class="p-50">'
@@ -173,6 +209,16 @@ $(()=>{
 			$('#rtable').prepend(replyHtml);
 			$('#r_contents').val('').focus();
 		}
+ 		function mapReplyListToRtable(rList){
+ 			let rListHtml=''
+ 			rList.forEach(function(reply, idx){
+ 				rListHtml+='<tr><td class="p-20">'+reply.r_writer+'</td>'
+   		           			+'<td class="p-50">'+reply.r_contents+'</td>'
+		           			+'<td class="p-30">'+reply.r_date+'</td></tr>'
+ 			}) //end forEach
+ 			$('#rtable').html(rListHtml)
+			$('#r_contents').val('').focus()
+ 		}
 	</script>
 </body>
 </html>

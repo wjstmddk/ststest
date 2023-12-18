@@ -41,11 +41,54 @@
 			<jsp:include page="footer.jsp" />
 		</footer>
 	</div>
-	<script >
+	<script>
+	let isCheck=false;  //true
+	$('#checkId').on('click',function(){
+		let id= $('#m_id').val();
+		if(id ==''){
+			$('#checkMsg').html('아이디를 입력하세요');
+			$('#m_id').focus();
+			return;
+		}
+		let sendId = {m_id:id};
+		//sendId.m_pwd="1111";
+		console.log(sendId);
+		$.ajax({
+			method:'get',
+			url: '/member/idCheck', //?m_id='+$('#m_id').val(), //대/중/소 (가능하면 명사)
+			//data: m_id='+$('#m_id').val(),
+			data: sendId,
+			//dataType: 'json', //text(html), jsonp
+		}).done(function(res, status, xhr){
+			console.log("res:", res);
+			console.log("status:", status);
+			console.log("xhr:", xhr);
+			//메세지 출력
+ 			if(res=='ok'){
+ 				$('#checkMsg').html('사용가능한 아이디입니다').css('color','blue');	
+ 			}else{
+ 				$('#checkMsg').html('이미 사용중인 아이디입니다').css('color','red');
+ 			}
+			
+			//$('#checkMsg').html(res).css('color','blue');
+			isCheck=true;
+		}).fail((err,status)=>{
+			console.log("err:", err)
+			console.log("status:", status);
+			//$('#checkMsg').html(err.responseText).css('color','red');
+			isCheck=false;
+		}); //fail End
+	});//on end
+	
 	function check(){
+		if(isCheck ==false){
+			$('#checkMsg').html('아이디 중복 확인해주세요');
+			return false;
+		}
 		const jfrm=document.jFrm;
 		console.log(jfrm);
 		let length = jfrm.length-1;
+		//jQuery validation 활용
 		for(let i=0; i<length; i++){
 			if(jfrm[i].value=='' || jfrm[i].value==null){
 				alert(jfrm[i].title+" 입력!!!");
@@ -53,7 +96,7 @@
 				return false;
 			}
 		}
-		return true;  //jfrm.submit()하면 안됨;
+		return true;  //jfrm.submit();
 	}
 	</script>
 </body>

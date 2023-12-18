@@ -23,9 +23,9 @@ public class HomeController {
 	
 	@GetMapping("/")
 	public String home(Model model,HttpSession session) {
-		//이전 사용했던 세션 삭제
+		//사용즉시 삭제하기 힘들면 루트에서 일괄 삭제할 것.
 		session.removeAttribute("urlPrior_login");
-		session.removeAttribute("sDto");
+		//session.removeAttribute("sDto");
 		return "index"; 
 	}
 

@@ -89,6 +89,7 @@
 		insert into reply(r_bnum,r_contents,r_writer,r_date) 
 		values(#{r_bnum},#{r_contents},#{r_writer},default)
 	</insert>
+	
 	<insert id="replyInsertSelectKey" parameterType="ReplyDto" useGeneratedKeys="true" keyProperty="r_num">
 		insert into reply values(null,#{r_bnum},#{r_contents},#{r_writer}, default) 
 		<!--  MYSQL은 auto_increment로 생성된 댓글번호를 검색함 -->

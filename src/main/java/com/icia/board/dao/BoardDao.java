@@ -34,7 +34,8 @@ public interface BoardDao {
 		
 	boolean replyInsert(ReplyDto reply);
 	List<ReplyDto> getReplyList(Integer b_num);
-	int getReplyR_Num();
+	
+	boolean replyInsertSelectKey(ReplyDto reply);
 	ReplyDto getReplyNewOne(int r_num);
 	
 }

@@ -19,7 +19,7 @@ public interface MemberDao {
 	String getSecurityPw(String id);
 
 	MemberDto getMemberInfo(String id);
-
+	@Select("select count(*) from member where m_id=#{m_id}")
 	boolean idCheck(String m_id);
 }
 

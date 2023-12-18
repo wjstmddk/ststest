@@ -17,8 +17,8 @@ public class SessionInterceptor implements AsyncHandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		//http://localhost/member/login?id=aaa&pw=1111
-		//log.info("===preHandle call uri={}",request.getRequestURI());
-		//log.info("===queryString={}",request.getQueryString());
+		log.info("===preHandle call uri={}",request.getRequestURI());
+		log.info("===queryString={}",request.getQueryString());
 		HttpSession session=request.getSession();
 		if(session.getAttribute("mb")==null) {
 			//로그인 성공후 이전url 요청을 처리하기 위해 저장 
