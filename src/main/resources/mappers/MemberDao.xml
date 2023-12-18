@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--  에러시  window-preferences-maven검색-Download Artifact javadoc 체크할것 -->
+<!-- 
+	1.#{필드명}, #{속성명}, #{변수명} #{id} : 'aaa'
+	2.parameterType은 생략가능, 1개만 가능
+	3.select시 단일값(Integer,Boolean)등 생략가능,resultType생략 가능
+	  - 생략시 인터페이스의 매개변수, 리턴타입을 참조한다. 
+	4.insert,delete,update는 리턴값(Integer,Boolean)이므로 resultType사용 불가 
+	5.${필드명}, ${속성명}, ${변수명} : ${colName} :컬럼명일때 ''붙이지 않는다.
+ -->
+
+<mapper namespace="com.icia.board.dao.MemberDao">
+	<select id="login" parameterType="HashMap" resultType="boolean">
+		select count(*) from member where m_id=#{id} and m_pw=#{pw}
+	</select>
+	
+	<insert id="join" parameterType="MemberDto">
+	insert into member values(#{m_id},#{m_pw},#{m_name},
+	#{m_birth},#{m_addr},#{m_phone},default)
+	</insert>
+	<select id="getSecurityPw" parameterType="String" resultType="String">
+		select m_pw from member where m_id=#{id}
+	</select>
+	<select id="getMemberInfo" resultType="MemberDto">
+		select m_id, m_name, m_point, g_name from minfo where m_id=#{id}; 
+	</select>
+</mapper>

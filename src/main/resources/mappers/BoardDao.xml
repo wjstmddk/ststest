@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 에러시 window-preferences-maven검색-Download Artifact javadoc 체크할것 -->
+<mapper namespace="com.icia.board.dao.BoardDao">
+	<select id="compareQuery">
+		<![CDATA[
+		select * from blist where b_num<10
+		]]>
+	</select>
+	
+<!--    select * from blist  -->
+<!--    where (b_writer like concat('%',#{val},'%') or b_title .... or b_contents...) -->
+<!--          and b_num < 10 -->
+	<select id="forEachTest">
+		select * from blist
+		where		       	
+		<trim suffix="and">
+			<foreach collection="map" index="key" item="val" separator="or" 
+			     open="(" close=")">
+				<!-- ${key} ${val} 일단 출력후 trim 붙인다. -->
+				<if test='key == "w"'>
+					b_writer like concat('%',#{val},'%') 
+				</if>
+				<if test="key == 't'.toString()">
+					b_title like concat('%',#{val},'%') 
+				</if>
+				<if test="key == 'c'.toString()">
+					b_contents like concat('%',#{val},'%') 
+				</if>
+			</foreach>
+		</trim>
+		<![CDATA[   
+		b_num < 10
+ 		]]>
+	</select>
+	<select id="getBoardList" parameterType="HashMap" resultType="BoardDto">
+		select date_format(b_date,'%y-%m-%d %h:%i:%s %p') as B_DATE,
+		 B_NUM,B_TITLE,B_WRITER from board order by b_date desc limit
+		#{startIdx}, #{listCnt};
+	</select>
+<!-- 	<select id="getBoardList"> -->
+<!-- 		select B_DATE, B_NUM,B_TITLE,B_WRITER from board  -->
+<!-- 		order by b_date desc  -->
+<!-- 		limit #{startIdx}, #{listCnt}; -->
+<!-- 	</select> -->
+	<select id="getBoardListSearch" resultType="BoardDto"
+		parameterType="SearchDto">
+		SELECT * FROM board
+<!-- 		<if test="colname != null and colname != ''"> -->
+		<if test='colname != null and colname != ""'>
+			WHERE ${colname} LIKE CONCAT('%',#{keyword},'%')
+			ORDER BY
+			B_DATE DESC
+		</if>
+		LIMIT #{startIdx}, #{listCnt}
+	</select>
+	<!--  위의 if쿼리의 choose when 버전 -->
+	<select id="getBoardListSearchNew" resultType="BoardDto"
+		parameterType="SearchDto">
+		SELECT * FROM board
+		<choose>
+			<when test="colname != null and colname!=''">
+				WHERE ${colname} LIKE CONCAT('%',#{keyword},'%')
+				ORDER BY B_DATE DESC
+				LIMIT #{startIdx}, #{listCnt}
+			</when>
+			<otherwise>
+				ORDER BY B_DATE DESC
+				LIMIT #{startIdx}, #{listCnt}
+			</otherwise>
+		</choose>
+	</select>
+	<select id="getBoardDetail" parameterType="Integer" resultType="BoardDto">
+	<!-- 본인글 확인 위해서 id도 추가 -->
+		select b_num, b_writer, b_title, b_contents, b_date
+		from board where b_num=#{b_num}
+	</select>
+	
+	
+	<select id="getReplyList" parameterType="Integer" resultType="ReplyDto">
+		select r_writer, r_contents, r_date from reply where r_bnum=#{b_num}
+		order by r_date desc
+<!-- 		select r_num, r_bnum, r_contents, r_id, date_format(r_date,'%y-%m-%d %h:%i:%s %p') as r_date  -->
+<!-- 		from reply where r_bnum=#{b_num} -->
+<!-- 		order by r_date desc -->
+	</select>
+	<insert id="replyInsert" parameterType="ReplyDto">
+		insert into reply(r_bnum,r_contents,r_writer,r_date) 
+		values(#{r_bnum},#{r_contents},#{r_writer},default)
+	</insert>
+	<insert id="replyInsertSelectKey" parameterType="ReplyDto" useGeneratedKeys="true" keyProperty="r_num">
+		insert into reply values(null,#{r_bnum},#{r_contents},#{r_writer}, default) 
+		<!--  MYSQL은 auto_increment로 생성된 댓글번호를 검색함 -->
+		<selectKey keyProperty="r_num" resultType="Integer" order="AFTER">
+<!-- 			SELECT MAX(R_NUM) FROM REPLY   새번호: 10 -->
+			<!-- mysql함수:가장 최근에 성공적으로 수행된 INSERT 구문의 첫번째 AUTO_INCREMENT column의 값을 반환 -->
+			   SELECT LAST_INSERT_ID()  
+		</selectKey>
+	</insert>
+	<select id="getReplyNewOne" parameterType="Integer" resultType="ReplyDto">
+		select * from reply where r_num=#{r_num}		
+	</select>
+</mapper>
