@@ -45,6 +45,11 @@ public class BoardController {
 			return "redirect:/board/list";
 		}
 	}
+	@GetMapping("/board/write")
+	public String boardWrite() {
+		log.info("글쓰기 창 열기");
+		return"boardWrite";
+	}
 	@GetMapping("/board/list")
 	public String boardList(SearchDto sDto, Model model, HttpSession session) {
 		log.info("before sDto:{}"+sDto);
