@@ -37,5 +37,7 @@ public interface BoardDao {
 	
 	boolean replyInsertSelectKey(ReplyDto reply);
 	ReplyDto getReplyNewOne(int r_num);
+	boolean boardWriteSelectKey(BoardDto board);
+	boolean fileInsertMap(Map<String, String> fMap);
 	
 }

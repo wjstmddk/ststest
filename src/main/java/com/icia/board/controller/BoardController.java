@@ -58,16 +58,30 @@ public class BoardController {
 	//		                 ,HttpSession session, RedirectAttributes rttr) {
 		log.info("글쓰기 처리");
 		log.info("board={}", board);
-
+        //(주의)file미첨부시: 파라미터는 attachments="" 넘어옴
 		for(MultipartFile mf: board.getAttachments()) {
 			log.info("파일명:{}",mf.getOriginalFilename());
 			log.info("파일 사이즈:{}byte", mf.getSize());
-			System.out.println("---------------------");
+			log.info("---------------------");
 		}
 		log.info("첨부파일 개수:{}개",board.getAttachments().size());
 		log.info("첨부파일 없니?:{}",board.getAttachments().get(0).isEmpty());
-		return null;
+		
+		//첨부파일 없을 때 session 불필요
+		//boolean result = bSer.boardWrite(board);
+
+		//session: 파일업로드 프로젝트 경로 얻기, 로그인한 회원정보
+		boolean result = bSer.boardWrite(board,session);
+		if (result) {
+			rttr.addFlashAttribute("msg", "글쓰기 성공");
+			return "redirect:/board/list";  
+////			// redirect는 get요청만 가능 
+		}else { //forward는 get--->get, post--->post만 가능
+			rttr.addFlashAttribute("msg", "글쓰기 실패");
+			return "redirect:/board/write";
+		}
 	}
+	
 	@GetMapping("/board/list")
 	public String boardList(SearchDto sDto, Model model, HttpSession session) {
 		log.info("before sDto:{}"+sDto);

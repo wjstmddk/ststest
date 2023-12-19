@@ -7,12 +7,16 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.icia.board.common.FileManager;
 import com.icia.board.common.Paging;
 import com.icia.board.dao.BoardDao;
+import com.icia.board.dao.MemberDao;
 import com.icia.board.dto.BoardDto;
+import com.icia.board.dto.MemberDto;
 import com.icia.board.dto.ReplyDto;
 import com.icia.board.dto.SearchDto;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -20,6 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 public class BoardService {
 	@Autowired
 	private BoardDao bDao;
+	@Autowired
+	private FileManager fm;
+	@Autowired
+	private MemberDao mDao;
 	public static final int LISTCNT=10;
 	public static final int PAGECOUNT=2;
 	
@@ -89,4 +97,32 @@ public class BoardService {
 		}
 		return rDto;
 	}
+	public boolean boardWrite(BoardDto board, HttpSession session) {
+		// boolean result=bDao.boardWrite(board); //새글번호:b_num=100
+		boolean result = bDao.boardWriteSelectKey(board); // 새글번호:b_num=10
+		log.info("새글글번호:{}", board.getB_num()); // 10
+		if (result) {
+			// 파일업로드
+			if (!board.getAttachments().get(0).isEmpty()) {
+				if (fm.fileUpload(board.getAttachments(), session, board.getB_num())) {
+					log.info("upload OK!!");
+					return true; // 글쓰기+첨부
+				}
+			}
+			// 작성한 회원의 point를 10증가
+			MemberDto member = (MemberDto) session.getAttribute("mb");
+			int point = member.getM_point() + 10;
+			if (point > 100) {
+				point = 100;
+			}
+			member.setM_point(point); // 새션 mb속성객체의 포인트도 업데이트 됨
+//			mDao.updateMemberPoint(member); // 아이디==eee, 포인트=10
+			// 포인트 갱신된 최신 포인트, 등급 회원정보
+			MemberDto mb = mDao.getMemberInfo(member.getM_id());
+			session.setAttribute("mb", mb);
+			return true; // 글쓰기만 성공
+		} else {
+			return false; // 글쓰기 실패
+		}
+	}// end boardWrite
 }
