@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icia.board.dto.BoardDto;
@@ -49,6 +51,22 @@ public class BoardController {
 	public String boardWrite() {
 		log.info("글쓰기 창 열기");
 		return"boardWrite";
+	}
+	@PostMapping("/board/write")
+	public String boardWrite(BoardDto board, RedirectAttributes rttr, HttpSession session) {
+    //public String boardWrite(BoardDto board, @RequestPart List<MultipartFile> attachments
+	//		                 ,HttpSession session, RedirectAttributes rttr) {
+		log.info("글쓰기 처리");
+		log.info("board={}", board);
+
+		for(MultipartFile mf: board.getAttachments()) {
+			log.info("파일명:{}",mf.getOriginalFilename());
+			log.info("파일 사이즈:{}byte", mf.getSize());
+			System.out.println("---------------------");
+		}
+		log.info("첨부파일 개수:{}개",board.getAttachments().size());
+		log.info("첨부파일 없니?:{}",board.getAttachments().get(0).isEmpty());
+		return null;
 	}
 	@GetMapping("/board/list")
 	public String boardList(SearchDto sDto, Model model, HttpSession session) {

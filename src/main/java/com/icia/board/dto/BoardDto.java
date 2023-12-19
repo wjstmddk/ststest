@@ -3,6 +3,9 @@ package com.icia.board.dto;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,5 +28,5 @@ public class BoardDto {
 	private LocalDateTime b_date;   //jdk1.8추가, 변환이 쉽다.   
 	//private Timestamp b_date;     //old, 날짜시간
 	private int b_views;
-	
+	List<MultipartFile> attachments;
 }
