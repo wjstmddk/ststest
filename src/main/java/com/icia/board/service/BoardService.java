@@ -103,7 +103,7 @@ public class BoardService {
 		log.info("새글글번호:{}", board.getB_num()); // 10
 		if (result) {
 			// 파일업로드
-			if (!board.getAttachments().get(0).isEmpty()) {
+			if (!board.getBoardDetailWithFile().get(0).isEmpty()) {
 				if (fm.fileUpload(board.getAttachments(), session, board.getB_num())) {
 					log.info("upload OK!!");
 					return true; // 글쓰기+첨부

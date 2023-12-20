@@ -28,5 +28,6 @@ public class BoardDto {
 	private LocalDateTime b_date;   //jdk1.8추가, 변환이 쉽다.   
 	//private Timestamp b_date;     //old, 날짜시간
 	private int b_views;
-	List<MultipartFile> attachments;
+	List<BoardFile> bfList;
+	//List<MultipartFile> attachments;
 }
