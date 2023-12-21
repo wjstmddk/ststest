@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data
@@ -28,6 +29,10 @@ public class BoardDto {
 	private LocalDateTime b_date;   //jdk1.8추가, 변환이 쉽다.   
 	//private Timestamp b_date;     //old, 날짜시간
 	private int b_views;
-	List<BoardFile> bfList;
-	//List<MultipartFile> attachments;
+	// 컨트롤러에서 @RequestPart로 받아도 됨,
+	// 하지만 필드로 추가하면 파라미터가 줄어서 좋다.
+	List<MultipartFile> attachments;  
+	//글상세보기할때 해당글에 첨부된 파일리스트
+	private List<BoardFile> bfList;  
+	//private List<ReplyDto> rList;  
 }

@@ -54,7 +54,7 @@ public class FileManager {
 		//파일의 정보를 BoardFile or HashMap에 저장
 		Map<String, String> fMap = new HashMap<String, String>();
 		fMap.put("b_num", String.valueOf(b_num));  
-		System.out.println("size:"+attachments.size());
+		//System.out.println("size:"+attachments.size());
 		boolean result = false;
 		for( MultipartFile mf : attachments) {
 			// 파일 메모리에 저장
@@ -98,11 +98,13 @@ public class FileManager {
 
 		// 파일명이 한글인 경우의 처리(UTF-8로 인코딩)
 		String fileName = URLEncoder.encode(bfile.getBf_oriname(), "UTF-8");
-		
 		return ResponseEntity.ok()
+				//다운로드 방식 
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+				//이미지 브라우저 열기
 				//.contentType(MediaType.IMAGE_JPEG)
+				//브라우저는 항상 서버로부터 최신 버전의 리소스를 다운로드
 				.cacheControl(CacheControl.noCache()).body(fResource);
 	}  //fileDownload end
 	

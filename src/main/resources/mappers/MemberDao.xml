@@ -26,4 +26,7 @@
 	<select id="getMemberInfo" resultType="MemberDto">
 		select m_id, m_name, m_point, g_name from minfo where m_id=#{id}; 
 	</select>
+	<update id="updateMemberPoint" parameterType="MemberDto">
+		update member set m_point=#{m_point} where m_id=#{m_id}
+	</update>
 </mapper>

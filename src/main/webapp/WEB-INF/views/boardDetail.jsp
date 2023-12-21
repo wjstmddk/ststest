@@ -14,7 +14,17 @@
 	crossorigin="anonymous" referrerpolicy="no-referrer">
  </script>
 <link rel="stylesheet" href="/css/style.css">
-
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- summernote css/js -->
+<link
+	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<!-- 한글패치 -->
+<script
+	src=" https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/lang/summernote-ko-KR.min.js"></script>
 <script>
 	//메시지 출력 부분
 	let m = "${msg}";
@@ -31,6 +41,18 @@ $(()=>{
 			$('.suc').css('display','none');
 			$('.bef').css('display','block');
 		}
+		
+		$('#summernote').summernote({
+			toolbar: false,//상세보기에선 툴바필요없음
+			height : 400, // 에디터 높이
+			minHeight : null, // 최소 높이
+			maxHeight : null, // 최대 높이
+			focus : true, // 에디터 로딩후 포커스를 맞출지 여부
+			lang : "ko-KR", // 한글 설정
+			placeholder : '최대 2048자까지 쓸 수 있습니다' //placeholder 설정
+		});
+		//서머노트 쓰기 비활성화를 해야 수정 불가
+		$('#summernote').summernote('disable');
 }) //ready
 </script>
 </head>
@@ -74,8 +96,33 @@ $(()=>{
 					</div>
 					<div>
 						<div class="t_content p-15 content_h">CONTENTS</div>
-						<div class="d_content p-85 content_h">${board.b_contents}</div>
+<%-- 					<div class="d_content p-85 content_h">${board.b_contents}</div> --%>
+						<div class="d_content p-85 content_h">
+							<!-- summernote form태그없을때는 div, form태그시는 textarea -->
+							<div id="summernote">${board.b_contents}</div>
+						</div>
 					</div>
+					<!-- 첨부파일 영역 -->
+					<div>
+						<div class="t_content p-15 file_h">FILES</div>
+						<div class="d_content p-85 file_h" style="overflow: auto;">
+							<c:if test="${empty board.bfList}">
+                            첨부된 파일이 없습니다.
+                        	</c:if>
+							<c:if test="${!empty board.bfList}">
+								<c:forEach var="file" items="${board.bfList}">
+									<a
+										href="/board/download?bf_sysname=${file.bf_sysname}
+									        &bf_oriname=${file.bf_oriname}">
+										<span class="file-title"> <i class="fa fa-file-o"
+											style="font-size: 24px"></i>${file.bf_oriname}
+									</span>
+									</a>
+								</c:forEach>
+							</c:if>
+						</div>
+					</div>
+					<!-- 파일 첨부 영역 끝 -->
 
 					<div class="btn-area">
 						<button class="btn-write" id="upbtn"
@@ -139,6 +186,42 @@ $(()=>{
 	</template>
 
 	<script>
+		$('#upbtn').hide();
+		$('#delbtn').hide();
+		let mid = '${mb.m_id}';
+		let bwriter = '${board.b_writer}';
+		console.log(mid, bwriter);
+		if (mid == bwriter) {
+			$('#upbtn').show();
+			$('#delbtn').show();
+		}
+		//D버튼: 게시글  삭제
+		function delete_board(bnum) {
+			//alert(bnum);
+			let conf = confirm("정말 삭제하겠습니까?");
+			if (conf == true) {
+				location.href = '/board/delete?b_num=' + bnum;
+			}
+		}
+		//B버튼: 게시글리스트
+		const backbtn = function() {
+			let url = "/board/list?";
+			let col = '${sessionScope.sDto.colname}';
+			let keyw = '${sDto.keyword}';
+
+			if (col == '') {
+				url += 'pageNum=${sessionScope.pageNum}';
+			} else {
+				url += 'colname=${sDto.colname}' + '&keyword=${sDto.keyword}'
+						+ '&pageNum=${sDto.pageNum}'
+			}
+			location.href = url;
+		}
+		
+		function upload_board(bnum) {
+			location.href = '/board/update?b_num=' + bnum;
+		}
+	
 		function replyInsert(){
 			//let data={}
 			//data.r_contents=$('#r_contents').val() 

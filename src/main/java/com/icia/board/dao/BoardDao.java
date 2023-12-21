@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -37,7 +38,18 @@ public interface BoardDao {
 	
 	boolean replyInsertSelectKey(ReplyDto reply);
 	ReplyDto getReplyNewOne(int r_num);
+	
 	boolean boardWriteSelectKey(BoardDto board);
 	boolean fileInsertMap(Map<String, String> fMap);
+	BoardDto getBoardDetailWithFile(Integer b_num);
 	
+	@Delete("DELETE FROM REPLY WHERE R_BNUM=#{b_num}")
+	boolean replyDelete(Integer b_num);
+	@Select("SELECT BF_SYSNAME FROM BOARDFILE WHERE BF_BNUM=#{b_num}")
+	String[] getSysNameFiles(Integer b_num);
+	
+	@Delete("DELETE FROM BOARDFILE WHERE BF_BNUM=#{b_num}")
+	boolean boardFileDelete(Integer b_num);
+	@Delete("DELETE FROM BOARD WHERE B_NUM=#{b_num}")
+	boolean boardDelete(Integer b_num);
 }

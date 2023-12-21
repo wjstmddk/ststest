@@ -4,29 +4,31 @@
 <!-- 에러시 window-preferences-maven검색-Download Artifact javadoc 체크할것 -->
 <mapper namespace="com.icia.board.dao.BoardDao">
 	<select id="compareQuery">
+		<!-- blist view: select * from board order by b_date desc -->
 		<![CDATA[
+		
 		select * from blist where b_num<10
 		]]>
 	</select>
-	
-<!--    select * from blist  -->
-<!--    where (b_writer like concat('%',#{val},'%') or b_title .... or b_contents...) -->
-<!--          and b_num < 10 -->
+
+	<!-- select * from blist -->
+	<!-- where (b_writer like concat('%',#{val},'%') or b_title .... or b_contents...) -->
+	<!-- and b_num < 10 -->
 	<select id="forEachTest">
 		select * from blist
-		where		       	
+		where
 		<trim suffix="and">
-			<foreach collection="map" index="key" item="val" separator="or" 
-			     open="(" close=")">
+			<foreach collection="map" index="key" item="val"
+				separator="or" open="(" close=")">
 				<!-- ${key} ${val} 일단 출력후 trim 붙인다. -->
 				<if test='key == "w"'>
-					b_writer like concat('%',#{val},'%') 
+					b_writer like concat('%',#{val},'%')
 				</if>
 				<if test="key == 't'.toString()">
-					b_title like concat('%',#{val},'%') 
+					b_title like concat('%',#{val},'%')
 				</if>
 				<if test="key == 'c'.toString()">
-					b_contents like concat('%',#{val},'%') 
+					b_contents like concat('%',#{val},'%')
 				</if>
 			</foreach>
 		</trim>
@@ -34,20 +36,23 @@
 		b_num < 10
  		]]>
 	</select>
-	<select id="getBoardList" parameterType="HashMap" resultType="BoardDto">
-		select date_format(b_date,'%y-%m-%d %h:%i:%s %p') as B_DATE,
-		 B_NUM,B_TITLE,B_WRITER from board order by b_date desc limit
+	<select id="getBoardList" parameterType="HashMap"
+		resultType="BoardDto">
+		select date_format(b_date,'%y-%m-%d %h:%i:%s %p') as
+		B_DATE,
+		B_NUM,B_TITLE,B_WRITER from board order by b_date desc limit
 		#{startIdx}, #{listCnt};
 	</select>
-<!-- 	<select id="getBoardList"> -->
-<!-- 		select B_DATE, B_NUM,B_TITLE,B_WRITER from board  -->
-<!-- 		order by b_date desc  -->
-<!-- 		limit #{startIdx}, #{listCnt}; -->
-<!-- 	</select> -->
+	<!-- <select id="getBoardList"> -->
+	<!-- select B_DATE, B_NUM,B_TITLE,B_WRITER from board -->
+	<!-- order by b_date desc -->
+	<!-- limit #{startIdx}, #{listCnt}; -->
+	<!-- </select> -->
 	<select id="getBoardListSearch" resultType="BoardDto"
 		parameterType="SearchDto">
-		SELECT * FROM board
-<!-- 		<if test="colname != null and colname != ''"> -->
+		<!-- 썸머노트사용시 본문에 이미지가 첨부되면 b_contents를 제외시켜야 함(오래걸림) -->
+		SELECT b_num, b_title,b_writer,b_date, b_views FROM board
+		<!-- <if test="colname != null and colname != ''"> -->
 		<if test='colname != null and colname != ""'>
 			WHERE ${colname} LIKE CONCAT('%',#{keyword},'%')
 			ORDER BY
@@ -55,10 +60,11 @@
 		</if>
 		LIMIT #{startIdx}, #{listCnt}
 	</select>
-	<!--  위의 if쿼리의 choose when 버전 -->
+	<!-- 위의 if쿼리의 choose when 버전 -->
 	<select id="getBoardListSearchNew" resultType="BoardDto"
 		parameterType="SearchDto">
-		SELECT * FROM board
+		<!--  썸머노트시: b_contents 제외할것. -->
+		SELECT b_num, b_title,b_writer,b_date, b_views  FROM board
 		<choose>
 			<when test="colname != null and colname!=''">
 				WHERE ${colname} LIKE CONCAT('%',#{keyword},'%')
@@ -71,35 +77,106 @@
 			</otherwise>
 		</choose>
 	</select>
-	<select id="getBoardDetail" parameterType="Integer" resultType="BoardDto">
-	<!-- 본인글 확인 위해서 id도 추가 -->
+	<!-- BoardDto에 List<BoardFile> bfList; 없을 때 -->
+	<!-- 본인글 확인 위해서 id(b_writer)도 추가 -->
+	<select id="getBoardDetail" parameterType="Integer"
+		resultType="BoardDto">
 		select b_num, b_writer, b_title, b_contents, b_date
-		from board where b_num=#{b_num}
+		from
+		board where
+		b_num=#{b_num}
+	</select>
+
+	<!-- BoardDto에 List<BoardFile> bfList; 있을 때 -->
+	<select id="getBoardDetailWithFile" parameterType="Integer"
+		resultMap="boardResult">
+		select b_num, b_writer, b_title, b_contents, b_date,
+		bf_oriname, bf_sysname
+		from board left join boardfile on b_num=bf_bnum
+		where b_num=#{b_num}
 	</select>
 	
+	<resultMap id="boardResult" type="BoardDto">
+		<!-- property는 도메인 클래스의 멤버변수명과 일치, column은 테이블의 컬럼명과 일치 -->
+		<id property="b_num" column="b_num" />  <!--id는 pk컬럼 -->
+		<result property="b_title" column="b_title" />
+		<!-- 자료형이 서로 호환되지 않을 때만 명시 -->
+		<result property="b_contents" column="b_contents" javaType="String" jdbcType="LONGVARCHAR"/>
+		<result property="b_writer" column="b_writer" />
+		<result property="b_date" column="b_date" />
+		<collection property="bfList" javaType="ArrayList" ofType="BoardFile">
+<!-- 			<id property="bf_num" column="bf_num" /> -->
+			<result property="bf_oriname" column="bf_oriname" />
+			<result property="bf_sysname" column="bf_sysname" />
+		</collection>
+	</resultMap>
 	
-	<select id="getReplyList" parameterType="Integer" resultType="ReplyDto">
+	<!-- <resultMap id="boardResult" type="BoardDto"> -->
+	<!-- 	<id property="b_num" column="b_num" /> property는 도메인 클래스의 멤버변수명과 일치, 
+			column은 테이블의 컬럼명과 일치 -->
+	<!-- 	<result property="b_title" column="b_title" /> -->
+	<!-- 	<result property="b_content" column="b_content" /> -->
+	<!-- 	<result property="b_writer" column="b_writer" /> -->
+	<!-- 	<result property="b_date" column="b_date" /> -->
+	<!-- 	<collection property="bfList" -->
+	<!-- 		javaType="ArrayList" resultMap="mapForBoardFile"> -->
+	<!-- 	</collection> -->
+	<!-- </resultMap> -->
+	
+	<!-- <resultMap type="boardFile" id="mapForBoardFile"> -->
+	<!-- 	<id property="bf_num" column="bf_num" /> -->
+	<!-- 	<result property="bf_oriname" column="bf_oriname" /> -->
+	<!-- 	<result property="bf_sysname" column="bf_sysname" /> -->
+	<!-- </resultMap> -->
+
+	<select id="getReplyList" parameterType="Integer"
+		resultType="ReplyDto">
 		select r_writer, r_contents, r_date from reply where r_bnum=#{b_num}
 		order by r_date desc
-<!-- 		select r_num, r_bnum, r_contents, r_id, date_format(r_date,'%y-%m-%d %h:%i:%s %p') as r_date  -->
-<!-- 		from reply where r_bnum=#{b_num} -->
-<!-- 		order by r_date desc -->
+		<!-- select r_writer, r_contents, date_format(r_date,'%y-%m-%d 
+			%h:%i:%s %p') as r_date -->
+		<!-- from reply where r_bnum=#{b_num} -->
+		<!-- order by r_date desc -->
 	</select>
+	
+	<select id="getBoardFileList" resultType="BoardFile">
+		select bf_oriname, bf_sysname from boardfile where bf_bnum=#{b_num}
+	</select>
+		
 	<insert id="replyInsert" parameterType="ReplyDto">
-		insert into reply(r_bnum,r_contents,r_writer,r_date) 
+		insert into
+		reply(r_bnum,r_contents,r_writer,r_date)
 		values(#{r_bnum},#{r_contents},#{r_writer},default)
 	</insert>
-	
-	<insert id="replyInsertSelectKey" parameterType="ReplyDto" useGeneratedKeys="true" keyProperty="r_num">
-		insert into reply values(null,#{r_bnum},#{r_contents},#{r_writer}, default) 
-		<!--  MYSQL은 auto_increment로 생성된 댓글번호를 검색함 -->
-		<selectKey keyProperty="r_num" resultType="Integer" order="AFTER">
-<!-- 			SELECT MAX(R_NUM) FROM REPLY   새번호: 10 -->
-			<!-- mysql함수:가장 최근에 성공적으로 수행된 INSERT 구문의 첫번째 AUTO_INCREMENT column의 값을 반환 -->
-			   SELECT LAST_INSERT_ID()  
+
+	<insert id="replyInsertSelectKey" parameterType="ReplyDto"
+		useGeneratedKeys="true" keyProperty="r_num">
+		insert into reply values(null,#{r_bnum},#{r_contents},#{r_writer},
+		default)
+		<!-- MYSQL은 auto_increment로 생성된 댓글번호를 검색함 -->
+		<selectKey keyProperty="r_num" resultType="Integer"
+			order="AFTER">
+			<!-- SELECT MAX(R_NUM) FROM REPLY 새번호: 10 -->
+			<!-- mysql함수:가장 최근에 성공적으로 수행된 INSERT 구문의 첫번째 AUTO_INCREMENT 생성값을 반환 -->
+			SELECT LAST_INSERT_ID()
 		</selectKey>
 	</insert>
-	<select id="getReplyNewOne" parameterType="Integer" resultType="ReplyDto">
-		select * from reply where r_num=#{r_num}		
+	<select id="getReplyNewOne" parameterType="Integer"
+		resultType="ReplyDto">
+		select * from reply where r_num=#{r_num}
 	</select>
+
+	<insert id="boardWriteSelectKey" parameterType="BoardDto"
+		useGeneratedKeys="true" keyProperty="b_num">
+		insert into board
+		values(null,#{b_title},#{b_contents},#{b_writer},default,default)
+		<selectKey keyProperty="b_num" resultType="Integer"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()  <!-- 가장 최근 오토인크리먼트 생성값 -->
+		</selectKey>
+	</insert>
+	<insert id="fileInsertMap" parameterType="Map">
+		INSERT INTO BOARDFILE
+		VALUES(null,#{b_num}, #{oriFileName},#{sysFileName})
+	</insert>
 </mapper>

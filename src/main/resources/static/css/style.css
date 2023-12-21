@@ -485,7 +485,7 @@ span.file-title {
 }
 
 .btn-write[type="reset"], .btn-write[type="button"] {
-	background-color: #f68c8e;
+	background-color: #ff2f34;
 	border-color: #ff7575;
 }
 
@@ -496,7 +496,7 @@ span.file-title {
 	line-height: 1.5;
 	border-radius: 6px;
 	color: #fff;
-	background-color: #f68c8e;
+	background-color: #ff2f34;
 	border-color: #ff7575;
 	margin-top: 10px;
 }

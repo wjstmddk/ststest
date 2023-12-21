@@ -21,7 +21,7 @@
 	<logger name="jdbc.connection" level="off"/>
 	<logger name="jdbc.resultsettable" level="debug"/>
 	<logger name="jdbc.audit" level="off"/>
-	<logger name="jdbc.sqltiming" level="info"/>
+	<logger name="jdbc.sqltiming" level="off"/>
 	<logger name="jdbc.resultset" level="off"/>
 	<root level="warn">
 		<appender-ref ref="console" />

@@ -6,7 +6,6 @@
     <script src="/js/jquery-3.7.0.min.js"></script>
     <script>
     $(()=>{
-    	alert("test");
     	if(${mb!=null}){
     		let loginName='${mb.m_name}'; //로그아웃시 mb속성 삭제할것.
     		$('#m_name').html(loginName+' 님');

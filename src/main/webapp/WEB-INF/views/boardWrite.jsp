@@ -52,6 +52,7 @@ $(()=>{
         <div class="content">
             <form action="/board/write" class="write-form" 
             method="post" enctype="multipart/form-data">
+            
                 <div class="user-info">
                     <div class="user-info-sub">
                         <p>등급 [${mb.g_name}]</p>
@@ -92,8 +93,10 @@ $(()=>{
 	$('#attachments').on('change', function(){
 		//파일 선택후 열기 버튼을 누르면 change이벤트 발생
 		console.log($('#attachments'));
+		
+		//let files =document.getElementById('attachments').files;
 		let files =$('#attachments')[0].files;
-		console.log(files); //[,]
+		console.log(files); //['둘리.jpg','aaa.jpg']
 		
 		let fileName='';
 		if(files.length > 1 ){
@@ -110,11 +113,11 @@ $(()=>{
 		let col= '${sDto.colname}';
 		let keyw='${sDto.keyword}';
 		
-		if(col==null){
-			url+='pageNum=${pageNum}';
+		if(col==''){
+			url+='pageNum=${sessionScope.pageNum}';
 		}else{
 			url+='colname=${sDto.colname}'+'&keyword=${sDto.keyword}'
-			     +'&pageNum=${pageNum}' 
+			     +'&pageNum=${sDto.pageNum}' 
 		}
 		location.href= url;
 	}

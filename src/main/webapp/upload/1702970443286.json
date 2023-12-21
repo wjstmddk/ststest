@@ -1,0 +1,9 @@
+{
+  "name": "kr.co.raon.touchenex.firefox",
+  "description": "CrossEX NativeMessagingHost",
+  "path": ".\\CrossEXChrome.exe",
+  "type": "stdio",
+  "allowed_extensions": [
+    "touchenex@raon.co.kr"
+  ]
+}
