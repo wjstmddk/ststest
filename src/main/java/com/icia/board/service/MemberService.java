@@ -1,6 +1,7 @@
 package com.icia.board.service;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -50,5 +51,9 @@ public class MemberService {
 			return "ok"; // 사용가능한 아이디
 		}
 		return "fail";
+	}
+
+	public Map<String,Object> testParam2(String id, Integer pw) {
+		return mDao.testParam2(id, pw);
 	}
 }

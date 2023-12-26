@@ -241,6 +241,8 @@ $(()=>{
 				//data: data,
 				//data: $('#rform').serialize()  //r_contents='댓글3'&r_writer='aaa'...
 				//1. urlEncoded방식(get,post): 문자열에 특수문자는 못넘김
+				//header의 contentType기본값
+				//contentType: 'application/x-www-form-urlencoded'
 				//2. json방식(post만): 서버에 json형식 데이터 전송--->서버에서 @RequestBoby로 받을것 
 				contentType: 'application/json;charset=UTF-8',
 				data: JSON.stringify(data) 

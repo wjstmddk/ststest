@@ -8,9 +8,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.icia.board.dto.BoardDto;
+import com.icia.board.dto.BoardFile;
 import com.icia.board.dto.ReplyDto;
 import com.icia.board.dto.SearchDto;
 
@@ -52,4 +54,13 @@ public interface BoardDao {
 	boolean boardFileDelete(Integer b_num);
 	@Delete("DELETE FROM BOARD WHERE B_NUM=#{b_num}")
 	boolean boardDelete(Integer b_num);
+	@Delete("DELETE FROM BOARDFILE WHERE BF_SYSNAME=#{sysname}")
+	boolean delBoardFile(String sysname);
+	
+	@Select("select bf_oriname, bf_sysname from boardfile where bf_bnum=#{b_num}")
+	List<BoardFile> getBoardFileList(Integer b_num);
+	
+	@Update("UPDATE board SET b_title=#{b_title},b_contents=#{b_contents}, b_date=now()"
+			+ " WHERE b_num=#{b_num}")
+	boolean boardUpdate(BoardDto board);
 }

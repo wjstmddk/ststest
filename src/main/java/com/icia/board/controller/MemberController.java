@@ -94,4 +94,5 @@ public class MemberController {
 		rttr.addFlashAttribute("msg", "Post로그아웃 성공");
 		return "redirect:/";
 	}
+	
 }//class End

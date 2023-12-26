@@ -139,10 +139,6 @@
 		<!-- order by r_date desc -->
 	</select>
 	
-	<select id="getBoardFileList" resultType="BoardFile">
-		select bf_oriname, bf_sysname from boardfile where bf_bnum=#{b_num}
-	</select>
-		
 	<insert id="replyInsert" parameterType="ReplyDto">
 		insert into
 		reply(r_bnum,r_contents,r_writer,r_date)

@@ -114,7 +114,7 @@ public class FileManager {
 		log.info("delete realPath: {}",realPath);
 		for (String sysname : sysfiles) {  
 			File file = new File(realPath + sysname);
-			log.info("File: {}",file.getAbsoluteFile());
+			log.info("++++AbsoluteFile: {}",file.getAbsoluteFile());
 			if (file.exists()) {
 				file.delete();
 				log.info("서버 파일 삭제 완료");

@@ -29,4 +29,10 @@
 	<update id="updateMemberPoint" parameterType="MemberDto">
 		update member set m_point=#{m_point} where m_id=#{m_id}
 	</update>
+	
+<!-- 	<select id="testParam2" > -->
+		<!-- arg0, arg1...  or param1, param2... 해야함.--> 
+		<!-- 불편하면 mapper에 직접 쿼리문 명시 --> 
+<!-- 		select count(*) from member where m_id=#{param1} and m_pw=#{param2} -->
+<!-- 	</select> -->
 </mapper>

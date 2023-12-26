@@ -162,5 +162,34 @@ public class BoardController {
 			return "redirect:/"; // index.jsp
 		}
 	}
-	
-}
+	@GetMapping("/board/update")
+	public String boardUpdateFrm(Integer b_num, Model model) {
+		log.info("글 수정창 열기");
+		BoardDto board=bSer.getBoardDetail(b_num);
+		//List<BoardFile> fList=bSer.getBoardFileList(b_num);
+		if(board!=null) {
+			model.addAttribute("board", board);
+			//model.addAttribute("fList", fList);
+			return "boardUpdate";
+		}else {
+			return "redirect:/board/list";
+		}
+	}
+	@PostMapping("/board/update")
+    //public String boardUpdate(@RequestPart List<MultipartFile> attachments,BoardDto board
+    //							,HttpSession session,RedirectAttributes rttr){
+	public String boardUpdate(BoardDto board,HttpSession session,RedirectAttributes rttr){
+        log.info("글 수정 처리");
+        log.info("board: {}",board);
+        log.info("files size: {}",board.getAttachments().size());
+        //수정시 포인트 증가는 없으므로 boardWrite재활용 불가
+        boolean result=bSer.boardUpdate(board,session);
+        if(result) {
+			rttr.addFlashAttribute("msg", "수정 성공");
+			return "redirect:/board/detail?b_num="+board.getB_num();
+		}else {
+			rttr.addFlashAttribute("msg", "수정 실패");
+			return "redirect:/board/update?b_num="+board.getB_num();
+		}
+    }
+}//end class

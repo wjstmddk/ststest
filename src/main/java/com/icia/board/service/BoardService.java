@@ -132,7 +132,7 @@ public class BoardService {
 			MemberDto mb = mDao.getMemberInfo(member.getM_id());
 			System.out.println("aft point:" + mb.getM_point());
 			session.setAttribute("mb", mb);
-			// 파일업로드
+			// 파일업로드 및 DB업로드
 			if (!board.getAttachments().get(0).isEmpty()) {
 				if (fm.fileUpload(board.getAttachments(), session, board.getB_num())) {
 					log.info("upload OK!!");
@@ -181,6 +181,29 @@ public class BoardService {
 		//4.[서버 파일들 삭제]
 		if(sysfiles.length!=0) {
 			fm.fileDelete(sysfiles, session);
+		}
+	}
+	public boolean delBoardFile(String sysname) {
+		return bDao.delBoardFile(sysname);
+	}
+
+	public List<BoardFile> getBoardFileList(Integer b_num) {
+		return bDao.getBoardFileList(b_num);
+	}
+	public boolean boardUpdate(BoardDto board, HttpSession session) {
+		//제목, 내용만 수정
+		boolean result=bDao.boardUpdate(board); 
+		if(result) {
+			//추가한 파일업로드 및 DB업로드
+			if(!board.getAttachments().get(0).isEmpty()) {
+				if(fm.fileUpload(board.getAttachments(),session,board.getB_num())) {
+					log.info("file update OK!!");
+					return true; //첨부+글쓰기 수정 성공
+				}
+			}
+			return true;  //글쓰기 수정 성공
+		}else {
+			return false;
 		}
 	}
 }
